@@ -1,24 +1,27 @@
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
-
-const cors = require('cors')
-
-const mongoose = require('mongoose')
+const express     = require('express'),
+      app         = express(),
+      bodyParser  = require('body-parser'),
+      apiRouter   = require('./routes/api'),
+      cors        = require('cors'),
+      mongoose    = require('mongoose');
+// DB Connection
 mongoose.connect(process.env.MONGOLAB_URI)
 
+// Use Declarations
 app.use(cors())
-
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-
-
 app.use(express.static('public'))
+
+// Root View Declaration
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+app.use('/api/exercise', apiRouter); 
 
+// ========================================
+// =============DONT TOUCH=================
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
@@ -42,7 +45,8 @@ app.use((err, req, res, next) => {
   res.status(errCode).type('txt')
     .send(errMessage)
 })
-
+// =============DONT TOUCH=================
+// ========================================
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
